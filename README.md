@@ -4,7 +4,7 @@ Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesn
 
 # Özellikler
 
-Dinamik Eşikleme: Trackbar (kaydırma çubukları) ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
+Dinamik Eşikleme: Trackbar ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
 
 Akıllı Filtreleme: Nesneleri sadece boyutlarına göre değil, şekillerine göre de ayırt edebilme.
 

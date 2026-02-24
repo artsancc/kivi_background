@@ -24,10 +24,6 @@ OS
 
 # Teknik İşleyiş ve Kod Mantığı
 
-Sistem temel olarak bir "Görüntü İşleme Hattı" üzerinde çalışır:
-Gemini şunu dedi:
-Bu Python kodu, görüntü işleme tekniklerini kullanarak bir görseldeki kivi gibi dairesel nesneleri tespit etmek, saymak ve arka planından ayırmak için tasarlanmış interaktif bir araçtır.
-
 
 Kivi Tespit ve Arka Plan Temizleme Sistemi
 Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesneleri (kivi vb.) dairesellik ve alan özelliklerine göre tespit eden, bunları sayan ve seçilen nesneleri orijinal görüntüden ayıklayarak siyah bir arka plana yerleştiren bir görüntü işleme uygulamasıdır.

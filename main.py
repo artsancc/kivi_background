@@ -2,43 +2,31 @@ import cv2
 import numpy as np
 import os
 
-# Görseli hazırlar.
+
+def nothing(x):
+    pass
+
+
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     return blur
 
-# Kenarları düzenler.
-def get_edges(img, low, high):
-    edges = cv2.Canny(img, low, high)
-    kernel = np.ones((3, 3), np.uint8)
-    dilated = cv2.dilate(edges, kernel, iterations=1)
-    return edges, dilated
 
-def arkaplani_siyah_yap(original_img, selected_contours, filename):
-    # Orijinal görüntüyle aynı boyutta, tamamen siyah bir tuval oluşturur.
+def arkaplani_siyah_yap(original_img, selected_contours):
     black_background = np.zeros_like(original_img)
-
-    # Sadece seçilen nesnelerin içini beyaz yapan bir maske oluşturur.
     mask = np.zeros(original_img.shape[:2], dtype=np.uint8)
+
     for cnt in selected_contours:
-        cv2.drawContours(mask, [cnt], -1, 255, -1)
+        # Hull kullanarak yarım ay boşluklarını kapatıyoruz
+        hull = cv2.convexHull(cnt)
+        cv2.drawContours(mask, [hull], -1, 255, -1)
 
-    # Maskeyi kullanarak orijinal resimdeki nesneleri siyah tuvale kopyalar.
     black_background[mask == 255] = original_img[mask == 255]
-
-    if not os.path.exists("output"):
-        os.makedirs("output")
-
-    cv2.imwrite(f"output/kivi_sonuc.jpg", black_background)
-    print(f"kivi_sonuc.jpg' olarak kaydedildi!")
+    return black_background
 
 
 def main():
-    ALT_ESIK = 160
-    UST_ESIK = 40
-    MIN_ALAN = 2000
-
     path = "kivi.jpeg"
     img = cv2.imread(path)
 
@@ -46,42 +34,69 @@ def main():
         print(f"Hata: '{path}' dosyası bulunamadı!")
         return
 
-    processed_base = preprocess_image(img)
-    edges, dilated = get_edges(processed_base, ALT_ESIK, UST_ESIK)
-
-    contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    output = img.copy()
-    current_selected_contours = []
-    count = 0
-
-    for cnt in contours:
-        if cv2.contourArea(cnt) > MIN_ALAN:
-            count += 1
-            current_selected_contours.append(cnt)
-
-            M = cv2.moments(cnt)
-            if M["m00"] != 0:
-                cX, cY = int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])
-                cv2.drawContours(output, [cnt], -1, (0, 255, 0), 2)
-                cv2.putText(output, str(count), (cX - 10, cY),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 0), 2)
-
-    cv2.putText(output, f"Bulunan Nesne: {count}", (20, 40), 1, 1.5, (0, 0, 255), 2)
-
-    cv2.imshow('Tespit Edilen Nesneler', output)
-    cv2.imshow('Kenar Analizi (Canny)', edges)
-
-    print(f"Toplam {count} nesne bulundu. Kaydediliyor...")
-
-    arkaplani_siyah_yap(img, current_selected_contours, "tespit_edilen_nesneler")
+    cv2.namedWindow('Ayarlar')
+    cv2.createTrackbar('Alt Esik', 'Ayarlar', 75, 255, nothing)
+    cv2.createTrackbar('Ust Esik', 'Ayarlar', 90, 255, nothing)
+    cv2.createTrackbar('Min Alan', 'Ayarlar', 4000, 6000, nothing)
+    # Yaprakları elemek için dairesellik eşiği (0 ile 1 arası, 0.7 genelde idealdir)
+    cv2.createTrackbar('Dairesellik %', 'Ayarlar', 70, 100, nothing)
 
     while True:
+        alt_esik = cv2.getTrackbarPos('Alt Esik', 'Ayarlar')
+        ust_esik = cv2.getTrackbarPos('Ust Esik', 'Ayarlar')
+        min_alan = cv2.getTrackbarPos('Min Alan', 'Ayarlar')
+        daire_esik = cv2.getTrackbarPos('Dairesellik %', 'Ayarlar') / 100.0
+
+        processed = preprocess_image(img)
+        edges = cv2.Canny(processed, alt_esik, ust_esik)
+
+        kernel = np.ones((3, 3), np.uint8)
+        dilated = cv2.dilate(edges, kernel, iterations=1)
+
+        contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        output_img = img.copy()
+        current_selected_contours = []
+        count = 0
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area > min_alan:
+                # --- Yaprak Eleme Mantığı (Dairesellik) ---
+                perimeter = cv2.arcLength(cnt, True)
+                if perimeter == 0: continue
+                circularity = 4 * np.pi * (area / (perimeter * perimeter))
+
+                # Eğer nesne yeterince yuvarlaksa (kiviyse) kabul et
+                if circularity > daire_esik:
+                    count += 1
+                    hull = cv2.convexHull(cnt)
+                    current_selected_contours.append(hull)
+
+                    cv2.drawContours(output_img, [hull], -1, (0, 255, 0), 2)
+
+                    M = cv2.moments(hull)
+                    if M["m00"] != 0:
+                        cX = int(M["m10"] / M["m00"])
+                        cY = int(M["m01"] / M["m00"])
+                        cv2.putText(output_img, str(count), (cX, cY), 1, 1.5, (255, 0, 0), 2)
+
+        final_result = arkaplani_siyah_yap(img, current_selected_contours)
+
+        cv2.imshow('1. Kenar Analizi', edges)
+        cv2.imshow('2. Tespit Edilenler', output_img)
+        cv2.imshow('3. SONUC', final_result)
+
         key = cv2.waitKey(1) & 0xFF
-        if key == ord('q'):  # 'q' tuşuna basılırsa döngüden çık
+        if key == ord('q'):
             break
+        elif key == ord('s'):
+            if not os.path.exists("output"): os.makedirs("output")
+            cv2.imwrite("output/kivi_sonuc.jpg", final_result)
+            print("Kaydedildi!")
 
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()

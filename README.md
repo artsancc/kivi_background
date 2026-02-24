@@ -1,18 +1,18 @@
 # KİVİ ARKA PLAN KALDIRMA UYGULAMASI
 
-Bu proje, görüntü işleme tekniklerini kullanarak bir görsel üzerindeki nesneleri tespit eder, sayar ve arka planını karartarak yeni bir dosya olarak kaydeder.
+Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesneleri; dairesellik ve alan özelliklerine göre tespit eden, bunları sayan ve seçilen nesneleri orijinal görüntüden ayıklayarak siyah bir arka plana yerleştiren bir görüntü işleme uygulamasıdır.
 
 # Özellikler
 
-Gürültüleri azaltmak için Gaussian Blur ve GrayScale dönüşümü.
+Dinamik Eşikleme: Trackbar (kaydırma çubukları) ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
 
-Canny Edge Detection algoritması ile hassas sınır tespiti.
+Akıllı Filtreleme: Nesneleri sadece boyutlarına göre değil, şekillerine göre de ayırt edebilme.
 
-Kopuk kenarları birleştirmek için dilation tekniği.
+Dışbükey Gövde: Nesne kenarlarındaki pürüzleri ve boşlukları kapatarak daha düzgün bir seçim maskesi oluşturma.
 
-Nesneleri orijinal resimden alıp siyah arka plana yerleştirme.
+Anlık Geri Bildirim: İşlenmiş kenar görüntüsü, tespit edilen nesneler ve nihai sonuç olmak üzere 3 farklı pencerede eş zamanlı izleme.
 
-Bulunan her nesnenin merkezine numara verme ve yeşil çerçeveleme.
+Kaydetme Seçeneği: 's' tuşuna basarak sonucu yerel dizine kaydetme imkanı.
 
 # Kullanılan Kütüphaneler
 
@@ -24,17 +24,57 @@ OS
 
 # Teknik İşleyiş ve Kod Mantığı
 
-Ön İşleme (Preprocessing):
-Görsel, preprocess_image fonksiyonu ile işlenir. Burada Grayscale dönüşümü ile veri sadeleştirilir ve Gaussian Blur ile yüksek frekanslı gürültüler bastırılarak Canny algoritması için ideal zemin hazırlanır.
+Sistem temel olarak bir "Görüntü İşleme Hattı" üzerinde çalışır:
+Gemini şunu dedi:
+Bu Python kodu, görüntü işleme tekniklerini kullanarak bir görseldeki kivi gibi dairesel nesneleri tespit etmek, saymak ve arka planından ayırmak için tasarlanmış interaktif bir araçtır.
 
-Kenar Algılama ve Morfoloji:
-get_edges fonksiyonu, Canny Edge Detection kullanarak pikseller arasındaki yoğunluk değişimlerinden nesne sınırlarını çıkarır. Ardından dilate işlemi uygulanarak, nesne sınırlarındaki olası kopukluklar birleştirilir ve kapalı alanlar oluşturulur.
+İşte projeniz için hazırladığım profesyonel README taslağı:
 
-Kontur Analizi ve Filtreleme:
-cv2.findContours ile tespit edilen sınırlar gruplanır. MIN_ALAN parametresi kullanılarak, belirlenen değerden küçük olan alanlar elenir. cv2.moments hesaplaması ile her nesnenin ağırlık merkezi bulunarak numaralandırma işlemi yapılır.
+Kivi Tespit ve Arka Plan Temizleme Sistemi
+Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesneleri (kivi vb.) dairesellik ve alan özelliklerine göre tespit eden, bunları sayan ve seçilen nesneleri orijinal görüntüden ayıklayarak siyah bir arka plana yerleştiren bir görüntü işleme uygulamasıdır.
 
-Maskeleme ve Segmentasyon:
-arkaplani_siyah_yap fonksiyonunda, orijinal görüntüyle aynı boyutta siyah bir numpy dizisi oluşturulur. Tespit edilen nesnelerin içini beyaz yapan bir maske hazırlanır. Bu maske referans alınarak sadece nesneler orijinal resimden kopyalanıp siyah tuvale yapıştırılır.
+Özellikler
+Dinamik Eşikleme: Trackbar (kaydırma çubukları) ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
+
+Akıllı Filtreleme: Nesneleri sadece boyutlarına (Alan) göre değil, şekillerine (Dairesellik) göre de ayırt edebilme (Örneğin: yaprakları eleyip sadece meyveleri seçmek).
+
+Convex Hull (Dışbükey Gövde): Nesne kenarlarındaki pürüzleri ve boşlukları kapatarak daha düzgün bir seçim maskesi oluşturma.
+
+Anlık Geri Bildirim: İşlenmiş kenar görüntüsü, tespit edilen nesneler ve nihai sonuç olmak üzere 3 farklı pencerede eş zamanlı izleme.
+
+Kaydetme Seçeneği: 's' tuşuna basarak sonucu yerel dizine kaydetme imkanı.
+
+Kullanılan Kütüphaneler
+Projenin çalışması için aşağıdaki Python kütüphanelerine ihtiyaç duyulmaktadır:
+
+OpenCV (cv2): Görüntü işleme, kenar algılama, kontur analizi ve görselleştirme için.
+
+NumPy (np): Matris işlemleri ve maskeleme operasyonları için.
+
+OS: Dosya sistemi işlemleri ve çıktı klasörü yönetimi için.
+
+Teknik İşleyiş ve Kod Mantığı
+Sistem temel olarak bir "Görüntü İşleme Hattı" (Image Pipeline) üzerinde çalışır:
+
+1. Ön İşleme (Preprocessing)
+
+Görüntü önce gri tonlamaya (cv2.cvtColor) çevrilir ve ardından Gaussian Blur uygulanır. Bu adım, görüntüdeki gürültüyü azaltarak kenar algılamanın daha sağlıklı çalışmasını sağlar.
+
+2. Kenar Algılama ve Genişletme
+
+Canny Edge Detection algoritması ile nesne sınırları belirlenir. Belirlenen sınırlar, cv2.dilate (genişletme) işlemi ile birleştirilerek kopuk çizgilerin önüne geçilir.
+
+3. Kontur Analizi ve Geometrik Filtreleme
+
+Kodun kalbi olan bu bölümde şu matematiksel filtreler uygulanır:
+
+Alan Filtresi: Belirli bir piksel değerinden küçük olan gürültüler elenir.
+
+Dairesellik Formülü: Nesnenin daireselliği hesaplanır.
+
+4. Maskeleme ve Convex Hull
+
+Tespit edilen konturlar Convex Hull yöntemiyle dıştan sarılır. Bu, meyvenin kenarlarındaki içe doğru olan girintileri kapatarak maskenin meyveyi tam kaplamasını sağlar. Ardından oluşturulan siyah maske orijinal görüntü ile çarpılarak nesne arka plandan koparılır.
 
 #Input
 
@@ -42,15 +82,20 @@ arkaplani_siyah_yap fonksiyonunda, orijinal görüntüyle aynı boyutta siyah bi
 
 #Output
 
-![kivi_sonuc](https://github.com/user-attachments/assets/f9c49b54-439a-4c4d-a752-e63fd4a6b4f8)
+![kivi_sonuc](https://github.com/user-attachments/assets/2f69c656-238b-4b54-a039-07bb0d400732)
 
 # Sonuç
 
-Konsol Çıktısı: Tespit edilen toplam nesne sayısı terminale yazdırılır.
+Uygulama çalıştırıldığında kullanıcıya dört temel etkileşim sunar:
 
-Görsel Çıktı: Ekranda iki pencere açılır; biri kenar analizini, diğeri ise numaralandırılmış nesneleri gösterir.
+1.Alt/Üst Eşik: Kenar hassasiyetini ayarlar.
 
-Dosya Çıktısı: output/kivi_sonuc.jpg adıyla, sadece tespit edilen nesnelerin olduğu siyah arka planlı yüksek çözünürlüklü bir görsel kaydedilir.
+2.Min Alan: Küçük toz veya gürültüleri temizler.
+
+3.Dairesellik: Sadece kivi gibi yuvarlak formları seçer.
+
+4.Çıktı: Tespit edilen her nesne numaralandırılır ve "SONUC" penceresinde arka planı tamamen temizlenmiş, temiz bir veri elde edilir.
 
 # Kullanım Notu:
+
 Program penceresi aktifken 'q' tuşuna basarak döngüyü sonlandırabilir ve uygulamadan güvenli bir şekilde çıkış yapabilirsiniz.

@@ -30,7 +30,7 @@ Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesn
 Özellikler
 Dinamik Eşikleme: Trackbar ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
 
-Akıllı Filtreleme: Nesneleri sadece boyutlarına göre değil, şekillerine göre de ayırt edebilme (Örneğin: yaprakları eleyip sadece meyveleri seçmek).
+Akıllı Filtreleme: Nesneleri sadece boyutlarına göre değil, şekillerine göre de ayırt edebilme.
 
 Dışbükey Gövde: Nesne kenarlarındaki pürüzleri ve boşlukları kapatarak daha düzgün bir seçim maskesi oluşturma.
 

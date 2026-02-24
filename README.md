@@ -51,15 +51,13 @@ Canny Edge Detection algoritması ile nesne sınırları belirlenir. Belirlenen 
 
 3. Kontur Analizi ve Geometrik Filtreleme
 
-Kodun kalbi olan bu bölümde şu matematiksel filtreler uygulanır:
-
 Alan Filtresi: Belirli bir piksel değerinden küçük olan gürültüler elenir.
 
 Dairesellik Formülü: Nesnenin daireselliği hesaplanır.
 
 4. Maskeleme ve Convex Hull
 
-Tespit edilen konturlar Convex Hull yöntemiyle dıştan sarılır. Bu, meyvenin kenarlarındaki içe doğru olan girintileri kapatarak maskenin meyveyi tam kaplamasını sağlar. Ardından oluşturulan siyah maske orijinal görüntü ile çarpılarak nesne arka plandan koparılır.
+Tespit edilen konturlar Convex Hull yöntemiyle dıştan sarılır. Bu, meyvenin kenarlarındaki içe doğru olan girintileri kapatarak maskenin meyveyi tam kaplamasını sağlar.
 
 #Input
 

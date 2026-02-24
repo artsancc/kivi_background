@@ -39,7 +39,6 @@ Anlık Geri Bildirim: İşlenmiş kenar görüntüsü, tespit edilen nesneler ve
 Kaydetme Seçeneği: 's' tuşuna basarak sonucu yerel dizine kaydetme imkanı.
 
 # Teknik İşleyiş ve Kod Mantığı
-Sistem temel olarak bir "Görüntü İşleme Hattı" üzerinde çalışır:
 
 1. Ön İşleme (Preprocessing)
 

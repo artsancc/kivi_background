@@ -24,40 +24,30 @@ OS
 
 # Teknik İşleyiş ve Kod Mantığı
 
-
 Kivi Tespit ve Arka Plan Temizleme Sistemi
-Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesneleri (kivi vb.) dairesellik ve alan özelliklerine göre tespit eden, bunları sayan ve seçilen nesneleri orijinal görüntüden ayıklayarak siyah bir arka plana yerleştiren bir görüntü işleme uygulamasıdır.
+Bu proje, OpenCV kütüphanesi kullanarak görüntüler üzerindeki belirli nesneleri dairesellik ve alan özelliklerine göre tespit eden, bunları sayan ve seçilen nesneleri orijinal görüntüden ayıklayarak siyah bir arka plana yerleştiren bir görüntü işleme projesidir.
 
 Özellikler
-Dinamik Eşikleme: Trackbar (kaydırma çubukları) ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
+Dinamik Eşikleme: Trackbar ile Canny kenar algılama eşiklerini anlık olarak değiştirebilme.
 
-Akıllı Filtreleme: Nesneleri sadece boyutlarına (Alan) göre değil, şekillerine (Dairesellik) göre de ayırt edebilme (Örneğin: yaprakları eleyip sadece meyveleri seçmek).
+Akıllı Filtreleme: Nesneleri sadece boyutlarına göre değil, şekillerine göre de ayırt edebilme (Örneğin: yaprakları eleyip sadece meyveleri seçmek).
 
-Convex Hull (Dışbükey Gövde): Nesne kenarlarındaki pürüzleri ve boşlukları kapatarak daha düzgün bir seçim maskesi oluşturma.
+Dışbükey Gövde: Nesne kenarlarındaki pürüzleri ve boşlukları kapatarak daha düzgün bir seçim maskesi oluşturma.
 
 Anlık Geri Bildirim: İşlenmiş kenar görüntüsü, tespit edilen nesneler ve nihai sonuç olmak üzere 3 farklı pencerede eş zamanlı izleme.
 
 Kaydetme Seçeneği: 's' tuşuna basarak sonucu yerel dizine kaydetme imkanı.
 
-Kullanılan Kütüphaneler
-Projenin çalışması için aşağıdaki Python kütüphanelerine ihtiyaç duyulmaktadır:
-
-OpenCV (cv2): Görüntü işleme, kenar algılama, kontur analizi ve görselleştirme için.
-
-NumPy (np): Matris işlemleri ve maskeleme operasyonları için.
-
-OS: Dosya sistemi işlemleri ve çıktı klasörü yönetimi için.
-
-Teknik İşleyiş ve Kod Mantığı
-Sistem temel olarak bir "Görüntü İşleme Hattı" (Image Pipeline) üzerinde çalışır:
+# Teknik İşleyiş ve Kod Mantığı
+Sistem temel olarak bir "Görüntü İşleme Hattı" üzerinde çalışır:
 
 1. Ön İşleme (Preprocessing)
 
-Görüntü önce gri tonlamaya (cv2.cvtColor) çevrilir ve ardından Gaussian Blur uygulanır. Bu adım, görüntüdeki gürültüyü azaltarak kenar algılamanın daha sağlıklı çalışmasını sağlar.
+Görüntü önce gri tonlamaya çevrilir ve ardından Gaussian Blur uygulanır. Bu adım, görüntüdeki gürültüyü azaltarak kenar algılamanın daha sağlıklı çalışmasını sağlar.
 
 2. Kenar Algılama ve Genişletme
 
-Canny Edge Detection algoritması ile nesne sınırları belirlenir. Belirlenen sınırlar, cv2.dilate (genişletme) işlemi ile birleştirilerek kopuk çizgilerin önüne geçilir.
+Canny Edge Detection algoritması ile nesne sınırları belirlenir. Belirlenen sınırlar, dilate işlemi ile birleştirilerek kopuk çizgilerin önüne geçilir.
 
 3. Kontur Analizi ve Geometrik Filtreleme
 

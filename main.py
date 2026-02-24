@@ -6,7 +6,7 @@ import os
 def nothing(x):
     pass
 
-
+# Görseli hazırlar.
 def preprocess_image(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -38,7 +38,6 @@ def main():
     cv2.createTrackbar('Alt Esik', 'Ayarlar', 75, 255, nothing)
     cv2.createTrackbar('Ust Esik', 'Ayarlar', 90, 255, nothing)
     cv2.createTrackbar('Min Alan', 'Ayarlar', 4000, 6000, nothing)
-    # Yaprakları elemek için dairesellik eşiği (0 ile 1 arası, 0.7 genelde idealdir)
     cv2.createTrackbar('Dairesellik %', 'Ayarlar', 70, 100, nothing)
 
     while True:
@@ -48,8 +47,8 @@ def main():
         daire_esik = cv2.getTrackbarPos('Dairesellik %', 'Ayarlar') / 100.0
 
         processed = preprocess_image(img)
+        # Kenarları düzenler.
         edges = cv2.Canny(processed, alt_esik, ust_esik)
-
         kernel = np.ones((3, 3), np.uint8)
         dilated = cv2.dilate(edges, kernel, iterations=1)
 
@@ -62,12 +61,10 @@ def main():
         for cnt in contours:
             area = cv2.contourArea(cnt)
             if area > min_alan:
-                # --- Yaprak Eleme Mantığı (Dairesellik) ---
                 perimeter = cv2.arcLength(cnt, True)
                 if perimeter == 0: continue
                 circularity = 4 * np.pi * (area / (perimeter * perimeter))
 
-                # Eğer nesne yeterince yuvarlaksa (kiviyse) kabul et
                 if circularity > daire_esik:
                     count += 1
                     hull = cv2.convexHull(cnt)
